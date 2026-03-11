@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Register</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>User Registration</h2>
+<form onsubmit="return register(event)">
+
+<input id="name" oninput="checkFormValidity()" placeholder="Name" autofocus>
+
+<input type="number" id="age" oninput="validateAge(); checkFormValidity()" placeholder="Age">
+<p id="ageError"></p>
+<input type="text" id="phone" oninput="validatePhone(); checkFormValidity()" placeholder="Phone">
+<p id="phoneError"></p>
+
+<div style="position:relative">
+
+<input type="password" id="password" oninput="validatePassword(); checkFormValidity()" placeholder="Password">
+<p id="passwordError"></p>
+
+<i class="fa-solid fa-eye"
+onclick="togglePassword()"
+style="position:absolute; right:15px; top:12px; cursor:pointer;"></i>
+
+</div>
+
+<button id="registerBtn" disabled>Register</button>
+
+<p id="message"></p>
+
+<a href="login.html">Already have account? Login</a>
+</form>
+</div>
+
+<script>
+
+function register(event){
+
+event.preventDefault(); // allows ENTER key submission
+
+const name = document.getElementById("name").value.trim();
+const age = document.getElementById("age").value;
+const phone = document.getElementById("phone").value;
+const password = document.getElementById("password").value;
+const message = document.getElementById("message");
+
+message.innerText="";
+
+if(name === "" || age === "" || phone === "" || password === ""){
+message.innerText="Please fill all fields";
+return;
+}
+
+/* AGE VALIDATION */
+
+if(age < 1 || age > 99){
+message.innerText="Age must be between 1 and 99";
+return;
+}
+
+/* PHONE VALIDATION */
+
+const phonePattern = /^[6-9][0-9]{9}$/;
+
+if(!phonePattern.test(phone)){
+message.innerText="Phone must start with 6-9 and be 10 digits";
+return;
+}
+
+/* PASSWORD VALIDATION */
+
+if(password.length < 6){
+message.innerText="Password must be at least 6 characters";
+return;
+}
+
+/* SEND DATA */
+
+fetch("/api/register",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({name,age,phone,password})
+})
+.then(res=>res.text())
+.then(data=>{
+message.innerText=data;
+});
+
+}
+
+function togglePassword(){
+
+const pass = document.getElementById("password");
+
+if(pass.type === "password"){
+pass.type = "text";
+}else{
+pass.type = "password";
+}
+
+}
+
+function validatePhone(){
+
+const phone = document.getElementById("phone").value;
+const error = document.getElementById("phoneError");
+
+const phonePattern = /^[6-9][0-9]{9}$/;
+
+if(phone === ""){
+error.innerText = "";
+return;
+}
+
+if(!phonePattern.test(phone)){
+error.innerText = "Phone must start with 6-9 and contain 10 digits";
+error.style.color = "red";
+}else{
+error.innerText = "";
+}
+
+}
+
+function validateAge(){
+
+const age = document.getElementById("age").value;
+const error = document.getElementById("ageError");
+
+if(age < 1 || age > 99){
+error.innerText = "Age must be between 1 and 99";
+error.style.color = "red";
+}else{
+error.innerText = "";
+}
+
+}
+
+function validatePassword(){
+
+const password = document.getElementById("password").value;
+const error = document.getElementById("passwordError");
+
+if(password.length < 6){
+error.innerText = "Password must be at least 6 characters";
+error.style.color = "red";
+}else{
+error.innerText = "";
+}
+
+}
+
+function checkFormValidity(){
+
+const name = document.getElementById("name").value.trim();
+const age = document.getElementById("age").value;
+const phone = document.getElementById("phone").value;
+const password = document.getElementById("password").value;
+
+const phonePattern = /^[6-9][0-9]{9}$/;
+
+let valid = true;
+
+if(name === "") valid = false;
+
+if(age < 1 || age > 99) valid = false;
+
+if(!phonePattern.test(phone)) valid = false;
+
+if(password.length < 6) valid = false;
+
+document.getElementById("registerBtn").disabled = !valid;
+
+}
+</script>
+
+</body>
+</html>
