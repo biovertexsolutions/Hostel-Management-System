@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+    
+<div class="container">
+
+<h2>User Login</h2>
+<form onsubmit="login(event)">
+<input id="phone" placeholder="Phone" autofocus>
+
+<div style="position:relative">
+
+<input id="password" type="password" placeholder="Password">
+
+<i class="fa-solid fa-eye"
+onclick="togglePassword()"
+style="position:absolute; right:15px; top:12px; cursor:pointer;"></i>
+
+</div>
+
+<button type="submit">Login</button>
+
+<p id="message"></p>
+
+<a href="register.html">Create Account</a>
+</form>
+</div>
+
+<script>
+
+function login(event){
+
+event.preventDefault();   // VERY IMPORTANT
+
+const phone = document.getElementById("phone").value;
+const password = document.getElementById("password").value;
+const message = document.getElementById("message");
+
+message.innerText="";
+
+fetch(`/api/login?phone=${phone}&password=${password}`,{
+method:"POST"
+})
+.then(res=>res.text())
+.then(data=>{
+
+if(data.includes("Login successful")){
+window.location.href="admin.html";
+}
+else{
+message.innerText="Incorrect Phone Number or Password";
+}
+
+});
+
+}
+
+function togglePassword(){
+
+const pass = document.getElementById("password");
+
+if(pass.type === "password"){
+pass.type = "text";
+}else{
+pass.type = "password";
+}
+
+}
+document.getElementById("phone").focus();
+document.getElementById("phone").addEventListener("input", function() {
+if(this.value.length === 10){
+document.getElementById("password").focus();
+}
+});
+</script>
+
+</body>
+</html>
